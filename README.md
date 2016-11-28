@@ -1,7 +1,9 @@
 # SmartCardIO
-This project offers WinSCard API in С++11 with STL, which supports PC/SC reader in Windows/Linux platform
+This project offers WinSCard API in C++11 with STL, which supports PC/SC reader in Windows/Linux platform
 
 This library is built on top of the WinSCard native library (Windows Smart Card SDK) for Windows, on top of the pcsc-lite library for Linux.
+
+Documentation available on GitHub Pages: https://razuevmax.github.io/SmartCardIO/
 
 A detailed description of all WinSCard API functions is available in the MSDN Library Documentation (https://msdn.microsoft.com/en-us/library/aa374731(v=VS.85).aspx).
 
@@ -28,7 +30,7 @@ Qt Creator 4.1.0/Qt 5.7/gcc 4
 /linux/ contains the relevant linux version files (temporary only sources, without makefile or pro-file)
 
 # Requirements
-c++11 compiler (desirable с++14)
+c++11 compiler (desirable C++14)
 
 STL c++11
 
