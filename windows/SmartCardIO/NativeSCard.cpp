@@ -643,28 +643,6 @@ void WinSCard::ReleaseContext(void)
  mCardConnected = false;
 }
 
-#if (NTDDI_VERSION >= NTDDI_WIN8)
-std::vector<BYTE> WinSCard::GetReaderIcon(const std::wstring& Reader)
-{
- std::vector<BYTE> pbIcon;
- if (!mContextEstablished)
-  return pbIcon;
- DWORD cbIcon;
- m_nLastError = SCardGetReaderIconW(m_hContext,Reader.c_str(),nullptr,&cbIcon);
- if (SUCCESS != m_nLastError)
- {
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return pbIcon;
- }
- pbIcon.resize(cbIcon);
- m_nLastError = SCardGetReaderIconW(m_hContext, Reader.c_str(), pbIcon.data(), &cbIcon);
- if (SUCCESS != m_nLastError && m_bThrowingErrors)
-  throw SCardException(m_nLastError);
- return pbIcon;
-}
-#endif
-
 long WinSCard::Connect(const std::wstring& Reader, SHARE ShareMode, PROTOCOL PreferredProtocols)
 {
  if (!mContextEstablished)

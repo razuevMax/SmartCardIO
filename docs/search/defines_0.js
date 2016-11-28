@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['scard_5fe_5fbad_5fseek',['SCARD_E_BAD_SEEK',['../scarddefs_8h.html#a31d139e6c676cd2fab0623ae21ab70ef',1,'scarddefs.h']]],
+  ['scard_5fe_5fcertificate_5funavailable',['SCARD_E_CERTIFICATE_UNAVAILABLE',['../scarddefs_8h.html#a207c5669744d92d4d7cbcff0a9db3b47',1,'scarddefs.h']]],
+  ['scard_5fe_5fcomm_5fdata_5flost',['SCARD_E_COMM_DATA_LOST',['../scarddefs_8h.html#ad8bbd25d5791876ea8a96cb66da7dea4',1,'scarddefs.h']]],
+  ['scard_5fe_5fdir_5fnot_5ffound',['SCARD_E_DIR_NOT_FOUND',['../scarddefs_8h.html#ae04cbf24714e853c6e6c00b57bf59473',1,'scarddefs.h']]],
+  ['scard_5fe_5ffile_5fnot_5ffound',['SCARD_E_FILE_NOT_FOUND',['../scarddefs_8h.html#a441ede7c429ef6ce9d202a670e500020',1,'scarddefs.h']]],
+  ['scard_5fe_5ficc_5fcreateorder',['SCARD_E_ICC_CREATEORDER',['../scarddefs_8h.html#a6efa4915e7d776132bd590784f959046',1,'scarddefs.h']]],
+  ['scard_5fe_5ficc_5finstallation',['SCARD_E_ICC_INSTALLATION',['../scarddefs_8h.html#ae3a62d60a6b932e44b3de03448c4e5f1',1,'scarddefs.h']]],
+  ['scard_5fe_5finvalid_5fchv',['SCARD_E_INVALID_CHV',['../scarddefs_8h.html#a0955ddac6368e6105150bb6add8b9320',1,'scarddefs.h']]],
+  ['scard_5fe_5fno_5faccess',['SCARD_E_NO_ACCESS',['../scarddefs_8h.html#a55253684cb8c6e229579acd9b97b1970',1,'scarddefs.h']]],
+  ['scard_5fe_5fno_5fdir',['SCARD_E_NO_DIR',['../scarddefs_8h.html#a1ed14750b7b1ee4db7478611827174ce',1,'scarddefs.h']]],
+  ['scard_5fe_5fno_5ffile',['SCARD_E_NO_FILE',['../scarddefs_8h.html#a373115198103dd0392d2ae23ae191fa0',1,'scarddefs.h']]],
+  ['scard_5fe_5fno_5freaders_5favailable',['SCARD_E_NO_READERS_AVAILABLE',['../scarddefs_8h.html#a81b59e9319d3fcd0d957d98781b3ebd2',1,'scarddefs.h']]],
+  ['scard_5fe_5fno_5fresrc_5fmngr_5frunning',['SCARD_E_NO_RESRC_MNGR_RUNNING',['../scarddefs_8h.html#abf793cfb5ca4fbcb1c553c98e5e7fbac',1,'scarddefs.h']]],
+  ['scard_5fe_5fno_5fsuch_5fcertificate',['SCARD_E_NO_SUCH_CERTIFICATE',['../scarddefs_8h.html#a19e74f9695b9dd8cf4746373b28cb852',1,'scarddefs.h']]],
+  ['scard_5fe_5funexpected',['SCARD_E_UNEXPECTED',['../scarddefs_8h.html#a05c6d9b6f2bf618209d6d7237470865e',1,'scarddefs.h']]],
+  ['scard_5fe_5funknown_5fres_5fmng',['SCARD_E_UNKNOWN_RES_MNG',['../scarddefs_8h.html#af11b8f794724a6d21abeb18f088ee8e9',1,'scarddefs.h']]],
+  ['scard_5fe_5funsupported_5ffeature',['SCARD_E_UNSUPPORTED_FEATURE',['../scarddefs_8h.html#aef39984cd0dd3822088099fffd9d5f96',1,'scarddefs.h']]],
+  ['scard_5fe_5fwrite_5ftoo_5fmany',['SCARD_E_WRITE_TOO_MANY',['../scarddefs_8h.html#a39f07a1cac212987d6df21f244f67b3a',1,'scarddefs.h']]],
+  ['scard_5fw_5fcancelled_5fby_5fuser',['SCARD_W_CANCELLED_BY_USER',['../scarddefs_8h.html#a265eddf5d6c9d2e961e830a547aa7db2',1,'scarddefs.h']]],
+  ['scard_5fw_5fchv_5fblocked',['SCARD_W_CHV_BLOCKED',['../scarddefs_8h.html#ab5aef3f176bec46265acd5bfa4dcea9e',1,'scarddefs.h']]],
+  ['scard_5fw_5feof',['SCARD_W_EOF',['../scarddefs_8h.html#a856792395314fea178aac05205697555',1,'scarddefs.h']]],
+  ['scard_5fw_5fsecurity_5fviolation',['SCARD_W_SECURITY_VIOLATION',['../scarddefs_8h.html#a0d616d40f6989a3aa7a6a2b6d8ff8e8f',1,'scarddefs.h']]],
+  ['scard_5fw_5fwrong_5fchv',['SCARD_W_WRONG_CHV',['../scarddefs_8h.html#a2f7bec7c8bf141cde74bc89b1dddd270',1,'scarddefs.h']]]
+];
