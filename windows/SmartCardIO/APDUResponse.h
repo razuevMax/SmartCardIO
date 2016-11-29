@@ -20,6 +20,7 @@ class APDUResponse
 public:
  //! \brief Status bytes length
  static const int SW_LENGTH = 2;
+ //! \fn APDUResponse::APDUResponse(const std::vector<BYTE>& vData)
  //! \brief Constructor from the byte data sent back by the card
  //! \param[in] vData Byte vector of data from the card
  APDUResponse(const std::vector<BYTE>& vData= std::vector<BYTE>());

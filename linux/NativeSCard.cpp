@@ -1,15 +1,9 @@
 #include "stdafx.h"
 #include "NativeSCard.h"
 #include "scardexception.h"
-#include "cardevent.h"
 #include <winscard.h>
 
 using namespace Smartcards;
-
-const std::wstring WinSCard::ALL_READERS{ SCARD_ALL_READERS };
-const std::wstring WinSCard::DEFAULT_READERS{ SCARD_DEFAULT_READERS };
-const std::wstring WinSCard::LOCAL_READERS{ SCARD_LOCAL_READERS };
-const std::wstring WinSCard::SYSTEM_READERS{ SCARD_SYSTEM_READERS };
 
 ReadersStates::ReadersStates()
 {
@@ -197,10 +191,17 @@ WinSCard::WinSCard(void)
 {
 }
 
+WinSCard::~WinSCard(void)
+{
+ m_bThrowingErrors=false;
+ if(mContextEstablished)
+  ReleaseContext();
+}
+
 std::vector<BYTE> WinSCard::GetCardStatus(DWORD& state, DWORD& protocol)
 {
  std::vector<BYTE> atr;
- if(!mCardConnected)
+ if (!mCardConnected)
  {
   m_nLastError = READER_UNAVAILABLE;
   if (m_bThrowingErrors)
@@ -209,99 +210,17 @@ std::vector<BYTE> WinSCard::GetCardStatus(DWORD& state, DWORD& protocol)
  }
  DWORD	pchReaders = AUTOALLOCATE;
  DWORD cByte = 32;
- wchar_t *szListReaders=nullptr;
+ wchar_t *szListReaders = nullptr;
  atr.resize(32);
- m_nLastError=SCardStatusW(m_hCard,szListReaders,&pchReaders,&state,&protocol,atr.data(),&cByte);
- if(SUCCESS==m_nLastError)
-  {
-   atr.resize(cByte);
-   m_nLastError=SCardFreeMemory(m_hContext, szListReaders);
-  }
- if(SUCCESS!=m_nLastError && m_bThrowingErrors)
+ m_nLastError = SCardStatusW(m_hCard, szListReaders, &pchReaders, &state, &protocol, atr.data(), &cByte);
+ if (SUCCESS == m_nLastError)
+ {
+  atr.resize(cByte);
+  m_nLastError = SCardFreeMemory(m_hContext, szListReaders);
+ }
+ if (SUCCESS != m_nLastError && m_bThrowingErrors)
   throw SCardException(m_nLastError);
  return atr;
-}
-
-void WinSCard::GetStatusChange(DWORD dwTimeout, ReadersStates& readerStates)
-{
- if(!mContextEstablished)
- {
-  m_nLastError = NO_SERVICE;
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
- }
- m_nLastError = SCardGetStatusChangeW(m_hContext, dwTimeout, readerStates.mReaderStates.data(), readerStates.mReaderStates.size());
- if (SUCCESS != m_nLastError && m_bThrowingErrors)
-  throw SCardException(m_nLastError);
-}
-
-void WinSCard::LocateCards(const std::vector<std::wstring>& cards, ReadersStates& readerStates)
-{
- if(!mContextEstablished)
- {
-  m_nLastError = NO_SERVICE;
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return;
- }
- unsigned int count = cards.size();
- std::vector<wchar_t> mszCards;
- for(unsigned int i=0;i<count;i++)
- {
-  std::wstring cardName = cards.at(i);
-  std::copy(cardName.begin(), cardName.end(), mszCards.end());
-  mszCards.push_back(0);
- }
- mszCards.push_back(0);
- m_nLastError = SCardLocateCardsW(m_hContext, mszCards.data(), readerStates.mReaderStates.data(), readerStates.mReaderStates.size());
- if (SUCCESS != m_nLastError && m_bThrowingErrors)
-  throw SCardException(m_nLastError);
-}
-
-void WinSCard::LocateCardsByATR(const std::vector<std::pair<std::vector<BYTE>, std::vector<BYTE>>>& atrMask, ReadersStates& readerStates)
-{
- if (!mContextEstablished)
- {
-  m_nLastError = NO_SERVICE;
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return;
- }
- std::vector<_SCARD_ATRMASK> atrMaskVector;
- for (auto& item : atrMask)
- {
-  _SCARD_ATRMASK atrMaskData;
-  atrMaskData.cbAtr = item.first.size();
-  std::copy(item.first.begin(), item.first.end(), atrMaskData.rgbAtr);
-  std::copy(item.second.begin(), item.second.end(), atrMaskData.rgbMask);
-  atrMaskVector.push_back(atrMaskData);
- }
- m_nLastError = SCardLocateCardsByATRW(m_hContext, atrMaskVector.data(), atrMaskVector.size(), readerStates.mReaderStates.data(), readerStates.mReaderStates.size());
- if (SUCCESS != m_nLastError && m_bThrowingErrors)
-  throw SCardException(m_nLastError);
-}
-
-void WinSCard::CardCancel()
-{
- if (!mContextEstablished)
- {
-  m_nLastError = NO_SERVICE;
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return;
- }
- m_nLastError = SCardCancel(m_hContext);
- if (SUCCESS != m_nLastError && m_bThrowingErrors)
-  throw SCardException(m_nLastError);
-}
-
-WinSCard::~WinSCard(void)
-{
- m_bThrowingErrors=false;
- //if(m_cardEventThread)
- // StopCardEvents();
- if(mContextEstablished)
-  ReleaseContext();
 }
 
 std::vector<std::wstring> WinSCard::ListReaders(void)
@@ -370,233 +289,6 @@ std::vector<std::wstring> WinSCard::ListReaderGroups(void)
  return result;
 }
 
-GUID WinSCard::GetProviderId(const std::wstring& cardName)
-{
- GUID result = { 0 };
- if (!mContextEstablished)
- {
-  m_nLastError = NO_SERVICE;
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return result;
- }
- m_nLastError = SCardGetProviderIdW(m_hContext, cardName.c_str(), &result);
- if (SUCCESS != m_nLastError && m_bThrowingErrors)
-  throw SCardException(m_nLastError);
- return result;
-}
-
-std::vector<std::wstring> WinSCard::ListCards(const std::vector<BYTE>& cardAtr, const std::vector<GUID>& guidInterfaces)
-{
- std::vector<std::wstring> result;
- if (!mContextEstablished)
- {
-  m_nLastError = NO_SERVICE;
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return result;
- }
- std::vector<wchar_t> cardsV;
- DWORD	pchCards = 0;
- wchar_t *pCardName;
- m_nLastError = SCardListCardsW(m_hContext, (cardAtr.size()<ATR_LENGTH)?nullptr:cardAtr.data(), guidInterfaces.empty() ? nullptr : guidInterfaces.data(), guidInterfaces.size(), nullptr, &pchCards);
- if (SUCCESS == m_nLastError)
- {
-  cardsV.resize(static_cast<size_t>(pchCards));
-  m_nLastError = SCardListCardsW(m_hContext, (cardAtr.size()<ATR_LENGTH) ? nullptr : cardAtr.data(), guidInterfaces.empty() ? nullptr : guidInterfaces.data(), guidInterfaces.size(), cardsV.data(), &pchCards);
-  if (SUCCESS == m_nLastError)
-  {
-   pCardName = cardsV.data();
-   while ('\0' != *pCardName)
-   {
-    result.push_back(pCardName);
-    pCardName = pCardName + wcslen(pCardName) + 1;
-   }
-  }
- }
- if (SUCCESS != m_nLastError && m_bThrowingErrors)
-  throw SCardException(m_nLastError);
- return result;
-}
-
-std::vector<std::wstring> WinSCard::ListCards(const std::vector<GUID>& guidInterfaces)
-{
- if (guidInterfaces.empty())
- {
-  m_nLastError = INVALID_PARAMETER;
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return std::vector<std::wstring>();
- }
- return ListCards(std::vector<BYTE>(), guidInterfaces);
-}
-
-std::vector<std::wstring> WinSCard::ListCards(const std::vector<BYTE>& cardAtr)
-{
- if (cardAtr.size()<ATR_LENGTH)
- {
-  m_nLastError = INVALID_ATR;
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return std::vector<std::wstring>();
- }
- return ListCards(cardAtr, std::vector<GUID>());
-}
-
-std::vector<std::wstring> WinSCard::ListCards(void)
-{
- return ListCards(std::vector<BYTE>(), std::vector<GUID>());
-}
-
-std::vector<GUID> WinSCard::ListInterfaces(const std::wstring& cardName)
-{
- std::vector<GUID> result;
- if (!mContextEstablished)
- {
-  m_nLastError = NO_SERVICE;
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return result;
- }
- DWORD pcguidInterfaces = 0;
- m_nLastError = SCardListInterfacesW(m_hContext, cardName.c_str(),nullptr,&pcguidInterfaces);
- if (SUCCESS == m_nLastError)
- {
-  result.resize(static_cast<size_t>(pcguidInterfaces));
-  m_nLastError = SCardListInterfacesW(m_hContext, cardName.c_str(), result.data(), &pcguidInterfaces);
- }
- if (SUCCESS != m_nLastError && m_bThrowingErrors)
-  throw SCardException(m_nLastError);
- return result;
-}
-
-void WinSCard::AddReaderToGroup(const std::wstring& ReaderName, const std::wstring& GroupName)
-{
- if (!mContextEstablished)
- {
-  m_nLastError = NO_SERVICE;
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return;
- }
- m_nLastError = SCardAddReaderToGroupW(m_hContext,ReaderName.c_str(),GroupName.c_str());
- if (SUCCESS != m_nLastError && m_bThrowingErrors)
-  throw SCardException(m_nLastError);
-}
-
-void WinSCard::ForgetCardType(const std::wstring& CardName)
-{
- if (!mContextEstablished)
- {
-  m_nLastError = NO_SERVICE;
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return;
- }
- m_nLastError = SCardForgetCardTypeW(m_hContext, CardName.c_str());
- if (SUCCESS != m_nLastError && m_bThrowingErrors)
-  throw SCardException(m_nLastError);
-}
-
-void WinSCard::ForgetReader(const std::wstring& ReaderName)
-{
- if (!mContextEstablished)
- {
-  m_nLastError = NO_SERVICE;
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return;
- }
- m_nLastError = SCardForgetReaderW(m_hContext, ReaderName.c_str());
- if (SUCCESS != m_nLastError && m_bThrowingErrors)
-  throw SCardException(m_nLastError);
-}
-
-void WinSCard::ForgetReaderGroup(const std::wstring& GroupName)
-{
- if (!mContextEstablished)
- {
-  m_nLastError = NO_SERVICE;
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return;
- }
- m_nLastError = SCardForgetReaderGroupW(m_hContext, GroupName.c_str());
- if (SUCCESS != m_nLastError && m_bThrowingErrors)
-  throw SCardException(m_nLastError);
-}
-
-void WinSCard::IntroduceReader(const std::wstring& ReaderName, const std::wstring& DeviceName)
-{
- if (!mContextEstablished)
- {
-  m_nLastError = NO_SERVICE;
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return;
- }
- m_nLastError = SCardIntroduceReaderW(m_hContext, ReaderName.c_str(), DeviceName.c_str());
- if (SUCCESS != m_nLastError && m_bThrowingErrors)
-  throw SCardException(m_nLastError);
-}
-
-void WinSCard::IntroduceReaderGroup(const std::wstring& GroupName)
-{
- if (!mContextEstablished)
- {
-  m_nLastError = NO_SERVICE;
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return;
- }
- m_nLastError = SCardIntroduceReaderGroupW(m_hContext, GroupName.c_str());
- if (SUCCESS != m_nLastError && m_bThrowingErrors)
-  throw SCardException(m_nLastError);
-}
-
-void WinSCard::RemoveReaderFromGroup(const std::wstring& ReaderName, const std::wstring& GroupName)
-{
- if (!mContextEstablished)
- {
-  m_nLastError = NO_SERVICE;
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return;
- }
- m_nLastError = SCardRemoveReaderFromGroupW(m_hContext, ReaderName.c_str(), GroupName.c_str());
- if (SUCCESS != m_nLastError && m_bThrowingErrors)
-  throw SCardException(m_nLastError);
-}
-
-void WinSCard::IntroduceCardType(const std::wstring& CardName, const std::vector<GUID>& guidInterfaces, const std::vector<BYTE>& cardAtr, const std::vector<BYTE>& cardAtrMask, LPCGUID pguidPrimaryProvider)
-{
- if (!mContextEstablished)
- {
-  m_nLastError = NO_SERVICE;
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return;
- }
- m_nLastError = SCardIntroduceCardTypeW(m_hContext, CardName.c_str(), pguidPrimaryProvider, guidInterfaces.empty()?nullptr:guidInterfaces.data(),guidInterfaces.size(),cardAtr.data(),cardAtrMask.empty()?nullptr:cardAtrMask.data(),cardAtr.size());
- if (SUCCESS != m_nLastError && m_bThrowingErrors)
-  throw SCardException(m_nLastError);
-}
-
-void WinSCard::IntroduceCardType(const std::wstring& CardName, const std::vector<GUID>& guidInterfaces, const std::vector<BYTE>& cardAtr, LPCGUID pguidPrimaryProvider)
-{
- IntroduceCardType(CardName, guidInterfaces, cardAtr, std::vector<BYTE>(), pguidPrimaryProvider);
-}
-
-void WinSCard::IntroduceCardType(const std::wstring& CardName, const std::vector<BYTE>& cardAtr, const std::vector<BYTE>& cardAtrMask, LPCGUID pguidPrimaryProvider)
-{
- IntroduceCardType(CardName, std::vector<GUID>(), cardAtr, cardAtrMask, pguidPrimaryProvider);
-}
-
-void WinSCard::IntroduceCardType(const std::wstring& CardName, const std::vector<BYTE>& cardAtr, LPCGUID pguidPrimaryProvider)
-{
- IntroduceCardType(CardName, std::vector<GUID>(), cardAtr, std::vector<BYTE>(), pguidPrimaryProvider);
-}
-
 void WinSCard::EstablishContext(SCOPE Scope)
 {
  if (mContextEstablished)
@@ -629,28 +321,6 @@ void WinSCard::ReleaseContext(void)
  mContextEstablished = false;
  mCardConnected = false;
 }
-
-#if (NTDDI_VERSION >= NTDDI_WIN8)
-std::vector<BYTE> WinSCard::GetReaderIcon(const std::wstring& Reader)
-{
- std::vector<BYTE> pbIcon;
- if (!mContextEstablished)
-  return pbIcon;
- DWORD cbIcon;
- m_nLastError = SCardGetReaderIconW(m_hContext,Reader.c_str(),nullptr,&cbIcon);
- if (SUCCESS != m_nLastError)
- {
-  if (m_bThrowingErrors)
-   throw SCardException(m_nLastError);
-  return pbIcon;
- }
- pbIcon.resize(cbIcon);
- m_nLastError = SCardGetReaderIconW(m_hContext, Reader.c_str(), pbIcon.data(), &cbIcon);
- if (SUCCESS != m_nLastError && m_bThrowingErrors)
-  throw SCardException(m_nLastError);
- return pbIcon;
-}
-#endif
 
 long WinSCard::Connect(const std::wstring& Reader, SHARE ShareMode, PROTOCOL PreferredProtocols)
 {
@@ -736,8 +406,6 @@ APDUResponse WinSCard::Transmit(APDUCommand ApduCmd)
  if(RESET_CARD==m_nLastError)
   {
    m_nProtocol=Reconnect(Shared,T0orT1,Leave);
-   //if(ApduCmd.getClass()==0x00 && ApduCmd.getIns()==0xC0)
-   // return APDUResponse(0x62,0xa4);
    RecvLength=RESPONSE_MAX_LENGTH;
    responseData.clear();
    m_nLastError=SCardTransmit(m_hCard,&ioRequest, commandData.data(), static_cast<DWORD>(commandData.size()), nullptr, responseData.data(), &RecvLength);
@@ -804,6 +472,19 @@ std::vector<BYTE> WinSCard::GetAttribute(DWORD AttribId)
  return attr;
 }
 
+void WinSCard::GetStatusChange(DWORD dwTimeout, ReadersStates& readerStates)
+{
+ if (!mContextEstablished)
+ {
+  m_nLastError = NO_SERVICE;
+  if (m_bThrowingErrors)
+   throw SCardException(m_nLastError);
+ }
+ m_nLastError = SCardGetStatusChangeW(m_hContext, dwTimeout, readerStates.mReaderStates.data(), readerStates.mReaderStates.size());
+ if (SUCCESS != m_nLastError && m_bThrowingErrors)
+  throw SCardException(m_nLastError);
+}
+
 void WinSCard::SetAttribute(DWORD AttribId, const std::vector<BYTE>& attr)
 {
  if (!mCardConnected)
@@ -854,18 +535,3 @@ DWORD WinSCard::CardControl(DWORD controlCode, LPVOID pInData, DWORD cInData, LP
   throw SCardException(m_nLastError);
  return retBytesCount;
 }
-
-//void WinSCard::StartCardEvents(void)
-//{
-// if (mCardEventThread)
-//  return;
-// mCardEventThread.reset(new CardEvent());
-// mCardEventThread->RegisterEventHandler()
-//}
-//
-//void WinSCard::StopCardEvents( void )
-//{
-// if (!mCardEventThread)
-//  return;
-// mCardEventThread.release();
-//}

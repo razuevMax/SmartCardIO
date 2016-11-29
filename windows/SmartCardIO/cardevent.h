@@ -82,7 +82,7 @@ namespace Smartcards
   //! \param[in] readerName Reader name where inserted card
   //! \param[in] ATR Byte array contains ATR inserted card
   void CardInserted(const std::wstring& readerName, const std::vector<BYTE>& ATR);
-  //! \fn void cardInserted(const std::wstring& readerName, const std::vector<BYTE>& ATR)
+  //! \fn void CardRemoved(const std::wstring& readerName, const std::vector<BYTE>& ATR)
   //! \brief inner function calls from card event thread for card removed
   //! \param[in] readerName Reader name where removed card
   //! \param[in] ATR Byte array contains ATR removed card

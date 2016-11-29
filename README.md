@@ -13,13 +13,13 @@ This library allows you to transmit and receive application protocol data units 
 
 Compilation of verified -
 Windows:
-MS Visual Studio 2015/Qt 5.7
+MS Visual Studio 2015
 
-Qt Creator 4.1.0/Qt 5.7/mingw 5.3 32
+Qt Creator 4.1.0/mingw 5.3 32
 
 Linux (tested on SUSE Linux 14):
 
-Qt Creator 4.1.0/Qt 5.7/gcc 4
+Qt Creator 4.1.0/gcc 4
 
 # Project directory structure
 
@@ -35,6 +35,3 @@ c++11 compiler (desirable C++14)
 STL c++11
 
 pcsc-lite library for linux/mac
-
-# Sample code
-Working ...

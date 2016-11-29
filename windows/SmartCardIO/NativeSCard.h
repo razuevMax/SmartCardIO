@@ -318,8 +318,8 @@ public:
  static const std::wstring DEFAULT_READERS;//!< Default winscard name for default readers group
  static const std::wstring LOCAL_READERS;//!< Default winscard name for local readers group
  static const std::wstring SYSTEM_READERS;//!< Default winscard name for system readers group
-                                          //! \fn WinSCard::WinSCard(void)
-                                          //! \brief Default constructor. 
+ //! \fn WinSCard::WinSCard(void)
+ //! \brief Default constructor. 
  WinSCard(void);
  //! \fn WinSCard::~WinSCard(void)
  //! \brief Destructor.

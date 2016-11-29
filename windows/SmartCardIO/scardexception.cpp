@@ -2,8 +2,6 @@
 #include "scardexception.h"
 #include "winscarderr.h"
 
-using namespace std;
-
 std::map<long, wstring> SCardException::errorMessages(
 { { Smartcards::SUCCESS,L"No error was encountered." },
   { Smartcards::INTERNAL_ERROR,L"An internal consistency check failed."},
@@ -139,7 +137,7 @@ std::string SCardException::errorStringA() const
  return m_errorStringA.empty() ? "Unknown exception" : m_errorStringA;
 }
 
-void SCardException::setErrorString(const wstring& errStr)
+void SCardException::setErrorString(const std::wstring& errStr)
 {
  m_errorString = errStr;
  std::vector<char> errorMsg;

@@ -48,14 +48,14 @@ public:
   //! \brief Get string exception message
   //! \return "Unknown exception" if it fails, else a string exception message
   std::string errorStringA(void) const;
-  //! \fn void SCardException::setErrorString( const std::wstring&)
+  //! \fn void SCardException::setErrorString( const std::wstring& errStr)
   //! \brief Sets exception message wstring
   //! \param[in] errStr The exception message wstring
-  void setErrorString(const std::wstring&);
-  //! \fn void SCardException::setErrorString( const std::string&)
+  void setErrorString(const std::wstring& errStr);
+  //! \fn void SCardException::setErrorString( const std::string& errStr)
   //! \brief Sets exception message string
   //! \param[in] errStr The exception message string
-  void setErrorString(const std::string&);
+  void setErrorString(const std::string& errStr);
   //! \fn long SCardException::errorCode( void ) const
   //! \brief Get error code
   //! \return A long error code

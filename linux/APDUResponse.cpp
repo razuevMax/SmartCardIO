@@ -5,9 +5,8 @@
 #include <vector>
 
 using namespace Smartcards;
-using namespace std;
 
-APDUResponse::APDUResponse(const vector<BYTE>& vData)
+APDUResponse::APDUResponse(const std::vector<BYTE>& vData)
 {
  setData(vData);
 }
@@ -40,18 +39,18 @@ APDUResponse::~APDUResponse(void)
 {
 }
 
-string APDUResponse::toString( void ) const
+std::string APDUResponse::toString( void ) const
 {
- string result;
- stringstream sDataStream(result, ios_base::in);
+ std::string result;
+ std::stringstream sDataStream(result, ios_base::in);
  sDataStream.setf(std::ios::hex, std::ios::basefield);
  sDataStream.setf(ios_base::uppercase);
  sDataStream.width(4);
- sDataStream << endl << "SW=" << setfill('0') << getStatus() << setfill(' ') << ' ';
+ sDataStream << std::endl << "SW=" << std::setfill('0') << std::getStatus() << std::setfill(' ') << ' ';
  size_t count = m_vData.size();
  if (count)
  {
-  sDataStream << endl << "Data=";
+  sDataStream << std::endl << "Data=";
   sDataStream.width(2);
   unsigned int nI = 0;
   while (nI < count)
@@ -59,17 +58,17 @@ string APDUResponse::toString( void ) const
    unsigned int di = 0;
    while (di<8 && nI<count)
    {
-    sDataStream << setfill('0') << m_vData.at(nI++) << setfill(' ') << ' ';
+    sDataStream << std::setfill('0') << m_vData.at(nI++) << std::setfill(' ') << ' ';
     di++;
    }
-   sDataStream << endl;
+   sDataStream << std::endl;
   }
  }
  sDataStream.flush();
 	return result;
 }
 
-void APDUResponse::setData( const vector<BYTE>& vData )
+void APDUResponse::setData( const std::vector<BYTE>& vData )
 {
  if(vData.empty())
   {
